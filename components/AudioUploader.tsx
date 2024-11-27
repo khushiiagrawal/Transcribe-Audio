@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-// import { SpeechRecognition } from "web-speech-api";
 import {
   Mic,
   Upload,
@@ -15,34 +14,13 @@ import { useHasBrowser } from "../lib/useHasBrowser";
 
 const ALLOWED_TYPES = ["audio/mpeg", "audio/wav", "audio/x-m4a", "audio/mp4"];
 
-declare global {
-  interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
-  }
-
-  interface SpeechRecognitionErrorEvent extends Event {
-    error: string;
-  }
-
-  interface SpeechRecognitionEvent extends Event {
-    resultIndex: number;
-    results: {
-      isFinal: boolean;
-      [key: number]: {
-        transcript: string;
-      };
-    }[];
-  }
-}
-
 const AudioUploader = () => {
-
+  // Browser detection
   const hasBrowser = useHasBrowser();
 
   // State management
   const [file, setFile] = useState<File | null>(null);
-  const recognitionRef = useRef<typeof window.SpeechRecognition | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [transcription, setTranscription] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
@@ -52,13 +30,14 @@ const AudioUploader = () => {
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   // Check for speech recognition support
   useEffect(() => {
     if (hasBrowser) {
-    const speechSupported = "SpeechRecognition" in window || "webkitSpeechRecognition" in window;
-    setIsSpeechSupported(speechSupported);
+      const speechSupported =
+        "SpeechRecognition" in window || "webkitSpeechRecognition" in window;
+      setIsSpeechSupported(speechSupported);
     }
   }, [hasBrowser, mediaStream]);
 
@@ -67,49 +46,13 @@ const AudioUploader = () => {
     if (!hasBrowser) return;
 
     const SpeechRecognition: typeof window.SpeechRecognition | typeof window.webkitSpeechRecognition | undefined =
-      (window as typeof window & {
-        SpeechRecognition: typeof SpeechRecognition;
-        webkitSpeechRecognition: typeof SpeechRecognition;
-      }).SpeechRecognition ||
-        (window as typeof window & {
-          SpeechRecognition: typeof SpeechRecognition;
-          webkitSpeechRecognition: typeof SpeechRecognition;
-        }).SpeechRecognition;
-  
-      if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = "en-US";
-  
-        let finalTranscript = "";
-  
-        recognition.onresult = (event: SpeechRecognitionEvent) => {
-          let interimTranscript = "";
-  
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-              finalTranscript += transcript + " ";
-            } else {
-              interimTranscript += transcript;
-            }
-          }
-  
-          setTranscription(finalTranscript + interimTranscript);
-        };
-  
-        recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-          console.error("Speech recognition error:", event.error);
-          setError(`Speech recognition error: ${event.error}`);
-          setIsRecording(false);
-        };
-  
-        recognitionRef.current = recognition;
-      }
+      (window as typeof window & { webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition ||
+      (window as typeof window & { webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
 
     if (SpeechRecognition) {
+      
       const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition as SpeechRecognition;
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = "en-US";
@@ -405,7 +348,7 @@ const AudioUploader = () => {
               </button>
             </div>
 
-         
+            {/* Error Message */}
             {error && (
               <div className="p-4 bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-200 rounded-xl flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-red-600 dark:bg-red-400 animate-pulse" />
@@ -414,7 +357,7 @@ const AudioUploader = () => {
             )}
           </div>
 
-         
+          {/* Right Column - Transcription */}
           <div className="relative">
             {transcription ? (
               <TranscriptionResult text={transcription} />
