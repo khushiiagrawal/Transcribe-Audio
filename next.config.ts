@@ -1,5 +1,20 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+interface WebpackConfig {
+  externals: string[];
+}
+
+interface ApiConfig {
+  bodyParser: {
+    sizeLimit: string;
+  };
+}
+
+interface NextConfig {
+  webpack: (config: WebpackConfig) => WebpackConfig;
+  api: ApiConfig;
+}
+
+const nextConfig: NextConfig = {
   webpack: (config) => {
     config.externals = [...config.externals, "fs"];
     return config;
