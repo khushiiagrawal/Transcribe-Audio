@@ -46,13 +46,17 @@ const AudioUploader = () => {
     if (!hasBrowser) return;
 
     const SpeechRecognition: typeof window.SpeechRecognition | typeof window.webkitSpeechRecognition | undefined =
-      (window as typeof window & { webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition ||
-      (window as typeof window & { webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
+      (window as typeof window & {
+        SpeechRecognition: typeof SpeechRecognition;
+        webkitSpeechRecognition: typeof SpeechRecognition;
+      }).SpeechRecognition ||
+      (window as typeof window & {
+        SpeechRecognition: typeof SpeechRecognition;
+        webkitSpeechRecognition: typeof SpeechRecognition;
+      }).webkitSpeechRecognition;
 
     if (SpeechRecognition) {
-      
       const recognition = new SpeechRecognition();
-      recognitionRef.current = recognition as SpeechRecognition;
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = "en-US";
@@ -91,7 +95,7 @@ const AudioUploader = () => {
         mediaStream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [hasBrowser, mediaStream]);
+  }, [hasBrowser]);
 
   // File handling functions
   const handleFileChange = (selectedFile: File) => {

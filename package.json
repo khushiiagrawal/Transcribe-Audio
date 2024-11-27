@@ -9,12 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/webpack": "^5.28.5",
     "file-saver": "^2.0.5",
     "groq-sdk": "^0.7.0",
     "lucide-react": "^0.453.0",
     "next": "15.0.1",
     "react": "19.0.0-rc-69d4b800-20241021",
-    "react-dom": "19.0.0-rc-69d4b800-20241021"
+    "react-dom": "19.0.0-rc-69d4b800-20241021",
+    "webpack": "^5.96.1"
   },
   "devDependencies": {
     "@types/dom-speech-recognition": "^0.0.4",
@@ -25,7 +27,7 @@
     "eslint": "^8",
     "eslint-config-next": "15.0.1",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "^3.4.15",
     "typescript": "^5"
   }
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef} from "react";
+import { useEffect, useRef } from "react";
 import { getAudioContext } from "../lib/audioContext";
 import { useHasBrowser } from "../lib/useHasBrowser";
 
