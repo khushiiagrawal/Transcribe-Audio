@@ -199,7 +199,7 @@ const AudioUploader = () => {
         {/* Header Section */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Audio Transcription
+            Transcribe Audio
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300">
             Transform your audio into text with professional accuracy
